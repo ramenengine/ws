@@ -1,3 +1,5 @@
+include ws/ws1.f
+
 s" Hi this is a label" label
 nr
 s" 1 ." button
