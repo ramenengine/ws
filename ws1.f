@@ -49,7 +49,7 @@ create figure  here cell+ ( current ) , 64 kbytes /allot
 : data@  data dup cell+ swap @ ;
 : data!  dup data !  data cell+ swap move ;
 
-: nextrow  0  peny @ fonth + 18 + at ;
+: nextrow  fs @ if  displayw 2 /  else 200 then  peny @ fonth + 18 + at ;
 : boxshadow  5 5 +at  dims@ black 0.5 alpha rectf  -5 -5 +at ;
 : printdata  data@ print ;
 : textoutline  at@  black 1 alpha
@@ -92,7 +92,7 @@ create figure  here cell+ ( current ) , 64 kbytes /allot
 
 only forth definitions also wsing
 
-create hovered 100 stack
+create hovered 12 stack
 
 : ?hover
     hovered 0 truncate
@@ -107,7 +107,7 @@ create hovered 100 stack
     {
         hovered top@ as #boxed ?? if
             a @ #click or a !
-            data@ } evaluate
+            data@ } ['] evaluate catch ?.catch
         else } then 
     ;
 : ?click  hovered #pushed -exit  click ;
@@ -123,7 +123,10 @@ create hovered 100 stack
 : button  ( text c )  { figure add data! #boxed attr! } ;
 : label  ( text c )   { figure add data! } ;
 : nr  { figure add #newrow attr! } ;  \ new row
-: drawui  consolas fnt !  unmount  0 0 at  (ui) ;
+: drawui  consolas fnt !  unmount
+    fs @ if   displayw 2 /  0 at  displayw 2 / margins w!
+    else      200 0 at    displayw margins w!
+    then  (ui) ;
 variable ui  ui on
 : toggle-ui  etype ALLEGRO_EVENT_KEY_DOWN = keycode <`> = and -exit  ui @ not ui ! ;
 :is ?system  ide-system  toggle-ui  ui @ if ui-mouse then ;
