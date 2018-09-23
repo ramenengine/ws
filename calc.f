@@ -1,5 +1,4 @@
-also wsing
-figure clear
+include ws1/ws1.f
 : neg negate ;
 : _   swap 10 * + ;
 
@@ -13,4 +12,3 @@ nr s"  */ " button s" mod " button s" /mod" button s"   0  " button
 nr s" sqrt" button s" cos " button s" sin " button s" atan2" button s" log2" button
 nr s" pfloor" button s" pceil" button
 0
-previous

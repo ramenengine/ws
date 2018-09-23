@@ -1,10 +1,14 @@
 \ really basic workspaces functionality; just buttons (and labels that are also buttons)
 
-#1 #2 #0 [ramen] checkver
+#1 #3 #0 [ramen] checkver
 
-only forth definitions define wsing
-require ramen/lib/draw.f
-require ramen/lib/rangetools.f
+only forth definitions
+
+define wsing
+create figure  here cell+ ( current ) , 64 kbytes /allot
+create window  %rect sizeof /allot
+include ramen/lib/draw.f
+include ramen/lib/rangetools.f
 
 redef on
 used @ 
@@ -22,8 +26,6 @@ bit #active
 bit #newrow
 bit #click
 drop
-
-create figure  here cell+ ( current ) , 64 kbytes /allot
 
 \ --- Low-level stuff ---
 : >first  cell+ ;
@@ -73,22 +75,33 @@ create figure  here cell+ ( current ) , 64 kbytes /allot
     then
     8 6 +at  printdata
     at ;
+
+: pos2@  pos@ dims@ 2+ ;
+: +window  window xy@ pos@ 2min window xy!
+           window xy2@ pos2@ 2max window xy2! ;
 : ren
-    white  
     #newrow ?? if  nextrow  exit  then
-    at@ pos!
     data@ strwh 16 8 2+ dims!
     penx @ ew@ + 10 + displayw >= if  nextrow  then
+    at@ pos!
     #boxed ?? if  drawbutton
               else  textoutline  drawlabel  then 
     ew@ 10 + 0 +at
+    +window
 ;
 
 : each>  r> swap >first >{
     begin #active ?? while  dup >r call r> next repeat  drop
 } ;
 
-: (ui)  figure each> ren ;
+ 
+: drawwindow
+    window xy@ 10 10 2- at  window wh@ 20 20 2+ black 0.5 alpha rectf  ;
+: /window  fs @ if displayw 2 / else 200 then 0 0 0 window xywh!
+    fs @ if   displayw 2 /  0 at  displayw 2 / margins w!
+    else      200 0 at    displayw margins w!
+    then  ; 
+: (ui)  drawwindow /window figure each> ren ;
 
 \ --- Interaction ---
 create hovered 12 stack
@@ -122,10 +135,7 @@ only forth definitions also wsing
 : button  ( text c )  { figure add data! #boxed attr! } ;
 : label  ( text c )   { figure add data! } ;
 : nr  { figure add #newrow attr! } ;  \ new row
-: drawui  consolas fnt !  unmount
-    fs @ if   displayw 2 /  0 at  displayw 2 / margins w!
-    else      200 0 at    displayw margins w!
-    then  (ui) ;
+: drawui  consolas fnt !  unmount  (ui) ;
 variable ui  ui on
 : toggle-ui  etype ALLEGRO_EVENT_KEY_DOWN = keycode <`> = and -exit  ui @ not ui ! ;
 :is ?system  ide-system  toggle-ui  ui @ if ui-mouse then ;
