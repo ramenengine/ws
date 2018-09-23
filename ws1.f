@@ -45,8 +45,7 @@ drop
 : next  next@ as ;
 : add  ( figure )  \ really basic, and we currently can't insert stuff
     dup >current as   next  #active attr!  me swap current!  data off ;
-: clear  ( figure )
-    dup cell+ dup 's a off swap ! ;
+\ : clear  ( figure )    dup cell+ dup 's a off swap ! ;
 : data@  ( - adr n ) data dup cell+ swap @ ;
 : data!  ( adr n )   dup data !  data cell+ swap move  ;
 
