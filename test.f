@@ -1,4 +1,4 @@
-0 0 0 include ws1/ws1.f
+include ws1/ws1.f
 
 figure blank
 s" Hi this is a label" label
