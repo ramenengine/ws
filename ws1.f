@@ -1,6 +1,6 @@
 \ really basic workspaces functionality; just buttons (and labels that are also buttons)
 
-#1 #0 #0 [version]
+#1 #0 #0 [version] [ws1]
 #1 #3 #0 [ramen] [checkver]
 
 only forth definitions

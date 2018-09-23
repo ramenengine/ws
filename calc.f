@@ -1,5 +1,3 @@
-require ws1/ws1.f
-
 : neg negate ;
 : _   swap 10 * + ;
 
