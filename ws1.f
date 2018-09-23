@@ -1,6 +1,7 @@
 \ really basic workspaces functionality; just buttons (and labels that are also buttons)
 
-#1 #3 #0 [ramen] checkver
+#1 #0 #0 [version]
+#1 #3 #0 [ramen] [checkver]
 
 only forth definitions
 
@@ -133,7 +134,7 @@ only forth definitions also wsing
 
 : blank  ( figure )
     dup >first dup >{ begin #active ?? while  me size@  next  erase repeat }
-    swap ! ;
+    swap current! ;
 : button  ( text c )  { figure add data! #boxed attr! } ;
 : label  ( text c )   { figure add data! } ;
 : nr  { figure add #newrow attr! } ;  \ new row
