@@ -1,4 +1,4 @@
-include ws/ws1.f
+include ws1/ws1.f
 
 s" Hi this is a label" label
 nr

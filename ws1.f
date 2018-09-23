@@ -25,30 +25,30 @@ drop
 
 create figure  here cell+ ( current ) , 64 kbytes /allot
 
+\ --- Low-level stuff ---
 : >first  cell+ ;
 : >current  ( fig - obj ) @ ;
-: current!  ( obj fig - )  ! ;
+: current!  ( obj fig - ) ! ;
 : attr!  #active or a ! ;
 : attr@  a @ ;
 : ??  attr@ and 0<> ;
 : size@  #active ?? if /head data @ + else 0 then ;
-
 : pos@  span xy@ ;
 : pos!  span xy! ;
 : dims@  span wh@ ;
 : dims!  span wh! ;
 : ew@   dims@ drop ;
 : eh@   dims@ nip ;
-
-: next  size@ me + as ;
-: add  ( figure )  \ really basic, we can't insert stuff
-    dup >current as next  #active attr!  me swap current! ;
+: next@  size@ me + ;
+: next  next@ as ;
+: add  ( figure )  \ really basic, and we currently can't insert stuff
+    dup >current as   next  #active attr!  me swap current!  data off ;
 : clear  ( figure )
-    dup cell+ dup off swap ! ;
+    dup cell+ dup 's a off swap ! ;
+: data@  ( - adr n ) data dup cell+ swap @ ;
+: data!  ( adr n )   dup data !  data cell+ swap move  ;
 
-: data@  data dup cell+ swap @ ;
-: data!  dup data !  data cell+ swap move ;
-
+\ --- Display ---
 : nextrow  fs @ if  displayw 2 /  else 200 then  peny @ fonth + 18 + at ;
 : boxshadow  5 5 +at  dims@ black 0.5 alpha rectf  -5 -5 +at ;
 : printdata  data@ print ;
@@ -90,10 +90,8 @@ create figure  here cell+ ( current ) , 64 kbytes /allot
 
 : (ui)  figure each> ren ;
 
-only forth definitions also wsing
-
+\ --- Interaction ---
 create hovered 12 stack
-
 : ?hover
     hovered 0 truncate
     figure each> 
@@ -101,7 +99,6 @@ create hovered 12 stack
             me hovered push  
         then
 ;
-
 : top@   dup #pushed 1 - [] @ ;
 : click
     {
@@ -111,8 +108,10 @@ create hovered 12 stack
         else } then 
     ;
 : ?click  hovered #pushed -exit  click ;
-
 : unclick  figure each> a @ #click invert and a ! ;
+
+\ --- Public stuff ---
+only forth definitions also wsing
 
 : ui-mouse
     etype ALLEGRO_EVENT_MOUSE_AXES = if ?hover then
@@ -133,5 +132,3 @@ variable ui  ui on
 :is ?overlay   ide-overlay  ui @ if drawui then  unmount ;
 
 only forth definitions
-
-
