@@ -1,7 +1,9 @@
-include ws1/ws1.f
+require ws1/ws1.f
+
 : neg negate ;
 : _   swap 10 * + ;
 
+figure blank
 s" Calculator" label
 nr s"  /s " button s" dup " button s" over" button s" drop " button s" swap" button 
 nr s" 7  _" button s" 8  _" button s" 9  _" button s"   /  " button

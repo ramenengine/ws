@@ -4,9 +4,10 @@
 
 only forth definitions
 
-define wsing
 create figure  here cell+ ( current ) , 64 kbytes /allot
 create window  %rect sizeof /allot
+
+define wsing
 include ramen/lib/draw.f
 include ramen/lib/rangetools.f
 
@@ -45,7 +46,6 @@ drop
 : next  next@ as ;
 : add  ( figure )  \ really basic, and we currently can't insert stuff
     dup >current as   next  #active attr!  me swap current!  data off ;
-\ : clear  ( figure )    dup cell+ dup 's a off swap ! ;
 : data@  ( - adr n ) data dup cell+ swap @ ;
 : data!  ( adr n )   dup data !  data cell+ swap move  ;
 
@@ -93,9 +93,8 @@ drop
     begin #active ?? while  dup >r call r> next repeat  drop
 } ;
 
- 
 : drawwindow
-    window xy@ 10 10 2- at  window wh@ 20 20 2+ black 0.5 alpha rectf  ;
+    window xy@ 10 10 2- at  window wh@ 20 20 2+ black 0.4 alpha rectf  ;
 : /window  fs @ if displayw 2 / else 200 then 0 0 0 window xywh!
     fs @ if   displayw 2 /  0 at  displayw 2 / margins w!
     else      200 0 at    displayw margins w!
@@ -131,6 +130,10 @@ only forth definitions also wsing
     etype ALLEGRO_EVENT_MOUSE_BUTTON_UP = if unclick then
 ;
 
+
+: blank  ( figure )
+    dup >first dup >{ begin #active ?? while  me size@  next  erase repeat }
+    swap ! ;
 : button  ( text c )  { figure add data! #boxed attr! } ;
 : label  ( text c )   { figure add data! } ;
 : nr  { figure add #newrow attr! } ;  \ new row

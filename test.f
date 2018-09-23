@@ -1,5 +1,6 @@
 include ws1/ws1.f
 
+figure blank
 s" Hi this is a label" label
 nr
 s" 1 ." button
