@@ -1,7 +1,7 @@
 \ really basic workspaces functionality; just buttons (and labels that are also buttons)
 
 #1 #0 #0 [version] [ws1]
-#1 #3 #0 [ramen] [checkver]
+#1 #3 #5 [ramen] [checkver]
 
 only forth definitions
 
@@ -48,7 +48,7 @@ drop
 : add  ( figure )  \ really basic, and we currently can't insert stuff
     dup >current as   next  #active attr!  me swap current!  data off ;
 : data@  ( - adr n ) data dup cell+ swap @ ;
-: data!  ( adr n )   dup data !  data cell+ swap move  ;
+: data!  ( adr n )   #1024 min dup data !  data cell+ swap move  ;
 
 \ --- Display ---
 : nextrow  fs @ if  displayw 2 /  else 200 then  peny @ fonth + 18 + at ;
