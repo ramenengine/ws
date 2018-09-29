@@ -1,7 +1,7 @@
 \ really basic workspaces functionality; just buttons (and labels that are also buttons)
 
-#1 #0 #2 [version] [ws1]
-#1 #3 #5 [ramen] [checkver]
+#1 #0 #3 [version] [ws1]
+#1 #5 #0 [ramen] [checkver]
 
 only forth definitions
 
@@ -51,11 +51,11 @@ drop
 : data!  ( adr n )   #1024 min dup data !  data cell+ swap move  ;
 
 \ --- Display ---
-: nextrow  fs @ if  displayw 2 /  else 200 then  peny @ fonth + 18 + at ;
+: newrow  fs @ if  displayw 0.67 *  else 200 then  peny @ fonth + 30 + at ;
 : boxshadow  5 5 +at  dims@ black 0.5 alpha rectf  -5 -5 +at ;
 : printdata  data@ print ;
 : textoutline  at@  black 1 alpha
-    9 6 +at  printdata
+    1 0 +at  printdata
     0 1 +at  printdata
     -1 0 +at printdata
     -1 0 +at printdata
@@ -64,7 +64,7 @@ drop
     1 0 +at  printdata
     1 0 +at  printdata
     at ;
-: drawlabel  at@  8 6 +at  white printdata  at ;
+: drawlabel  at@  0 13 +at  textoutline  white printdata  at  ew@ penx +! ;
 : drawbutton
     at@  
     #click ?? if
@@ -73,20 +73,20 @@ drop
     else
         boxshadow  dims@ grey rectf  dims@ white rect 
     then
-    8 6 +at  printdata
-    at ;
+    16 12 +at  printdata
+    at
+    ew@ 15 + penx +! ;
 
 : pos2@  pos@ dims@ 2+ ;
 : +window  window xy@ pos@ 2min window xy!
            window xy2@ pos2@ 2max window xy2! ;
 : ren
-    #newrow ?? if  nextrow  exit  then
-    data@ strwh 16 8 2+ dims!
-    penx @ ew@ + 10 + displayw >= if  nextrow  then
+    #newrow ?? if  newrow  exit  then
+    data@ strwh 32 16 2+ dims!
+    penx @ ew@ + 15 + displayw >= if  newrow  then
     at@ pos!
     #boxed ?? if  drawbutton
-              else  textoutline  drawlabel  then 
-    ew@ 10 + 0 +at
+              else  drawlabel  then 
     +window
 ;
 
@@ -96,13 +96,13 @@ drop
 
 : drawwindow
     window xy@ 10 10 2- at  window wh@ 20 20 2+ black 0.4 alpha rectf  ;
-: /window  fs @ if displayw 2 / else 200 then 0 0 0 window xywh!
-    fs @ if   displayw 2 /  0 at  displayw 2 / margins w!
+: /window  fs @ if displayw 0.67 * else 200 then 0 0 0 window xywh!
+    fs @ if   displayw 0.67 *  0 at  displayw 0.67 * margins w!
     else      200 0 at    displayw margins w!
     then  ; 
 : (ui)  drawwindow /window figure each> ren ;
 
-\ --- Interaction ---
+\ --- interaction ---
 create hovered 12 stack
 : ?hover
     hovered 0 truncate
