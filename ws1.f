@@ -9,8 +9,7 @@ create figure  here cell+ ( current ) , 64 kbytes /allot
 create window  %rect sizeof /allot
 
 define wsing
-include ramen/lib/draw.f
-include ramen/lib/rangetools.f
+include ws1/rangetools.f
 
 redef on
 used @ 
