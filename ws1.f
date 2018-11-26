@@ -102,15 +102,15 @@ drop
 : (ui)  drawwindow /window figure each> ren ;
 
 \ --- interaction ---
-create hovered 12 stack
+create hovered 12 *stack drop
 : ?hover
-    hovered 0 truncate
+    hovered vacate
     figure each> 
         evt ALLEGRO_MOUSE_EVENT.x 2@ 2p pos@ dims@ area inside? if
             me hovered push  
         then
 ;
-: top@   dup #pushed 1 - [] @ ;
+: top@   dup length 1 - swap []@ ;
 : click
     {
         hovered top@ as #boxed ?? if
@@ -118,7 +118,7 @@ create hovered 12 stack
             data@ } ['] evaluate catch ?.catch
         else } then 
     ;
-: ?click  hovered #pushed -exit  click ;
+: ?click  hovered length -exit  click ;
 : unclick  figure each> a @ #click invert and a ! ;
 
 \ --- Public stuff ---
