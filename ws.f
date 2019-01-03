@@ -13,12 +13,13 @@ variable ui  ui on
 define wsing
     include ws/rangetools.f
     
-    used @  0 used !  redef on
+    fields
+        struct %element  %element to fields  redef on
         var a  
         %rect sizeof field span \ pos and dims
         var data <adr \ cell counted
-        used @ constant /head
-    used !  redef off
+        %element sizeof constant /head
+    to fields  redef off
     
     #1 8 <<
     \ bit #deleted
