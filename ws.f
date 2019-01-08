@@ -156,3 +156,5 @@ only forth definitions also wsing
 
 :make ?system   ide-system  toggle-ui  ui @ if ui-mouse then ;
 :make ?overlay  ide-overlay  ui @ if drawui then  unmount ;
+
+: empty  figure blank empty ;
