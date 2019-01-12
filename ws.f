@@ -51,7 +51,7 @@ define wsing
     : data!  ( adr n )   #1024 min dup data !  data cell+ swap move  ;
     
     \ --- Display ---
-    : newrow  fs @ if  displayw 0.67 *  else 200 then  peny @ fonth + 30 + at ;
+    : newrow  fs @ if  displayw 0.67 *  else 200 then  peny @ fnt @ chrh + 30 + at ;
     : boxshadow  5 5 +at  dims@ black 0.5 alpha rectf  -5 -5 +at ;
     : printdata  data@ print ;
     : textoutline
@@ -86,7 +86,7 @@ define wsing
     ;
     : draw
         #newrow ?? if  newrow  exit  then
-        data@ strwh 32 16 2+ dims!
+        data@ stringwh 32 16 2+ dims!
         penx @ ew@ + 15 + displayw >= if  newrow  then
         at@ pos!
         #boxed ?? if  drawbutton
