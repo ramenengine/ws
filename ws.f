@@ -5,7 +5,8 @@
 
 only forth definitions
 
-create figure  here cell+ ( current ) , 64 kbytes /allot
+
+create figure _node static
 create window  %rect sizeof /allot
 create hovered  16 stack,
 variable ui  ui on
@@ -13,43 +14,43 @@ variable ui  ui on
 define wsing
     include ws/rangetools.f
     
-    fields
-        struct %element  %element to fields  redef on
-        var a  
-        %rect sizeof field span \ pos and dims
-        var data <adr \ cell counted
-        %element sizeof constant /head
-    to fields  redef off
     
+    ( attributes )
     #1 8 <<
     \ bit #deleted
     bit #boxed
-    bit #active
     bit #newrow
     bit #click
     drop
     
+    ( element class )
+    _node sizeof 0 class _element
+        var attr  
+        %rect sizeof field span \ pos and dims
+        var data <adr 
+        var datasize <int 
+    end-class
+    :noname  me /node ; _element class.constructor !
+    :noname  data @ -exit data @ free throw ; _element class.destructor !
+    
+        
     \ --- Low-level stuff ---
-    : >first  cell+ ;
-    : >current  ( fig - obj ) @ ;
-    : current!  ( obj fig - ) ! ;
-    : attr!  #active or a ! ;
-    : attr@  a @ ;
-    : ??  attr@ and 0<> ;
-    : size@  #active ?? if /head data @ + else 0 then ;
+    : ??  attr @ and 0<> ;
     : pos@  span xy@ ;
     : pos!  span xy! ;
     : dims@  span wh@ ;
     : dims!  span wh! ;
     : ew@   dims@ drop ;
     : eh@   dims@ nip ;
-    : next@  size@ me + ;
-    : next  next@ as ;
-    : add  ( figure )  \ really basic, and we currently can't insert stuff
-        dup >current as   next  #active attr!  me swap current!  data off ;
-    : data@  ( - adr n ) data dup cell+ swap @ ;
-    : data!  ( adr n )   #1024 min dup data !  data cell+ swap move  ;
-    
+    : *element  ( figure - me=new )  \ add an element
+        _element dynamic  me swap push ;
+    : data@  ( - adr n )
+        data @ datasize @ ;
+    : data!  ( adr n - )
+        data @ 0= if  dup allocate throw data ! dup datasize !
+                  else  data @ over resize throw data ! dup datasize ! then
+        ( adr n ) data @ swap move ;
+                  
     \ --- Display ---
     : newrow  fs @ if  displayw 0.67 *  else 200 then  peny @ fnt @ chrh + 30 + at ;
     : boxshadow  5 5 +at  dims@ black 0.5 alpha rectf  -5 -5 +at ;
@@ -93,15 +94,7 @@ define wsing
                   else  drawlabel  then 
         +window
     ;
-    
-    : each> ( list - <code> )  ( me=obj - )
-        r> swap >first >{
-            begin  #active ?? while
-                dup >r call r> next
-            repeat  drop
-        }
-    ;
-    
+        
     : drawwindow
         window xy@ 10 10 2- at  window wh@ 20 20 2+ black 0.4 alpha rectf  ;
     : /window
@@ -110,12 +103,12 @@ define wsing
         else      200 0 at    displayw margins w!
         then
     ; 
-    : (ui)  drawwindow /window figure each> draw ;
+    : (ui)  ( figure - )  drawwindow /window  each> as draw ;
     
     \ --- interaction ---
-    : ?hover
+    : ?hover  ( figure - )
         hovered vacate
-        figure each> 
+        each> as
             evt ALLEGRO_MOUSE_EVENT.x 2@ 2p pos@ dims@ area inside? if
                 me hovered push  
             then
@@ -123,38 +116,35 @@ define wsing
     : click
         hovered >top @ >{
             #boxed ?? if
-                a @ #click or a !
+                #click attr or!
                 data@ } ['] evaluate catch ?.catch
             ;then
         } 
     ;
     : ?click  hovered length -exit  click ;
-    : unclick  figure each> a @ #click invert and a ! ;
+    : unclick  figure each> as  #click attr not! ;
 
 \ --- Public stuff ---
 only forth definitions also wsing
 
 : ui-mouse
-    etype ALLEGRO_EVENT_MOUSE_AXES = if ?hover then
+    etype ALLEGRO_EVENT_MOUSE_AXES = if figure ?hover then
     etype ALLEGRO_EVENT_MOUSE_BUTTON_DOWN = if ?click then
     etype ALLEGRO_EVENT_MOUSE_BUTTON_UP = if unclick then
 ;
 
 : blank  ( figure )
-    dup >first dup >{
-        begin #active ?? while
-            me size@  next  erase
-        repeat
-    }
-    swap current!
+    vacate
 ;
-: button  ( text c )  { figure add data! #boxed attr! } ;
-: label  ( text c )   { figure add data! } ;
-: nr  { figure add #newrow attr! } ;  \ new row
-: drawui  consolas fnt !  unmount  (ui) ;
+: button  ( text c )  { figure *element data! #boxed attr ! } ;
+: label  ( text c )   { figure *element data! } ;
+: nr  { figure *element #newrow attr ! } ;  \ new row
+: drawui  consolas fnt !  unmount  figure (ui) ;
 : toggle-ui  etype ALLEGRO_EVENT_KEY_DOWN = keycode <`> = and -exit  ui @ not ui ! ;
 
 :make ?system   ide-system  toggle-ui  ui @ if ui-mouse then ;
 :make ?overlay  ide-overlay  ui @ if drawui then  unmount ;
 
 : empty  figure blank empty ;
+
+gild
