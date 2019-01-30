@@ -29,7 +29,7 @@ define wsing
         %rect sizeof field span \ pos and dims
         var data <adr 
         var datasize <int 
-    end-class
+    ;class
     :noname  me /node ; _element class.constructor !
     :noname  data @ -exit data @ free throw ; _element class.destructor !
     
@@ -142,9 +142,17 @@ only forth definitions also wsing
 : drawui  consolas fnt !  unmount  figure (ui) ;
 : toggle-ui  etype ALLEGRO_EVENT_KEY_DOWN = keycode <`> = and -exit  ui @ not ui ! ;
 
-:make ?system   ide-system  toggle-ui  ui @ if ui-mouse then ;
+: (system)   ide-system  toggle-ui  ui @ if ui-mouse then ;
+
+0 value ui:lasterr
+:make ?system
+    ['] (system) catch
+    dup if ui:lasterr 0= if cr ." GUI error." dup to ui:lasterr throw ;then then
+    to ui:lasterr
+;
+
 :make ?overlay  ide-overlay  ui @ if drawui then  unmount ;
 
-: empty  figure blank empty ;
+: empty  figure blank  hovered vacate  empty ;
 
 gild
