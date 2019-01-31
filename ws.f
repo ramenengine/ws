@@ -24,13 +24,12 @@ define wsing
     drop
     
     ( element class )
-    _node sizeof 0 class _element
+    0 dclass: _element
         var attr  
         %rect sizeof field span \ pos and dims
         var data <adr 
         var datasize <int 
     ;class
-    :noname  me /node ; _element class.constructor !
     :noname  data @ -exit data @ free throw ; _element class.destructor !
     
         
