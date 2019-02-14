@@ -24,7 +24,7 @@ define wsing
     drop
     
     ( element class )
-    0 dclass: _element
+    0 dynamic-class: _element
         var attr  
         %rect sizeof field span \ pos and dims
         var data <adr 
@@ -51,7 +51,7 @@ define wsing
         ( adr n ) data @ swap move ;
                   
     \ --- Display ---
-    : newrow  fs @ if  displayw 0.67 *  else 200 then  peny @ fnt @ chrh + 30 + at ;
+    : newrow  margins x@  peny @ fnt @ chrh + 30 + at ;
     : boxshadow  5 5 +at  dims@ black 0.5 alpha rectf  -5 -5 +at ;
     : printdata  data@ print ;
     : textoutline
@@ -80,10 +80,6 @@ define wsing
         ew@ 15 + penx +! ;
     
     : pos2@  pos@ dims@ 2+ ;
-    : +window
-        window xy@ pos@ 2min window xy!
-        window xy2@ pos2@ 2max window xy2!
-    ;
     : draw
         #newrow ?? if  newrow  exit  then
         data@ stringwh 32 16 2+ dims!
@@ -91,18 +87,19 @@ define wsing
         at@ pos!
         #boxed ?? if  drawbutton
                   else  drawlabel  then 
-        +window
     ;
         
-    : drawwindow
+    : draw-window
+        figure length 0= ?exit
         window xy@ 10 10 2- at  window wh@ 20 20 2+ black 0.4 alpha rectf  ;
+    
     : /window
-        fs @ if displayw 0.67 * else 200 then 0 0 0 window xywh!
-        fs @ if displayw 0.67 *  0 at  displayw 0.67 * margins w!
-        else      200 0 at    displayw margins w!
-        then
+        displayw 0.37 * 500 max displayw min  displayh  window wh!
+        displayw window w@ - 0 window xy!
+        window xywh@ margins xywh!
+        
     ; 
-    : (ui)  ( figure - )  drawwindow /window  each> as draw ;
+    : (ui)  ( figure - )  /window  draw-window  margins xy@ at  each> as draw ;
     
     \ --- interaction ---
     : ?hover  ( figure - )
@@ -138,7 +135,7 @@ only forth definitions also wsing
 : button  ( text c )  { figure *element data! #boxed attr ! } ;
 : label  ( text c )   { figure *element data! } ;
 : nr  { figure *element #newrow attr ! } ;  \ new row
-: drawui  consolas fnt !  unmount  figure (ui) ;
+: drawui  consolas font>  unmount  figure (ui) ;
 : toggle-ui  etype ALLEGRO_EVENT_KEY_DOWN = keycode <`> = and -exit  ui @ not ui ! ;
 
 : (system)   ide-system  toggle-ui  ui @ if ui-mouse then ;
@@ -152,6 +149,6 @@ only forth definitions also wsing
 
 :make ?overlay  ide-overlay  ui @ if drawui then  unmount ;
 
-: empty  figure blank  hovered vacate  empty ;
+:make free-node  destroy ;
 
 gild
