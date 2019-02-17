@@ -94,7 +94,7 @@ define wsing
         window xy@ 10 10 2- at  window wh@ 20 20 2+ black 0.4 alpha rectf  ;
     
     : /window
-        displayw 0.37 * 500 max displayw min  displayh  window wh!
+        displayw 0.37 * 500 max displayw min  displayh 100 - window wh!
         displayw window w@ - 0 window xy!
         window xywh@ margins xywh!
         
@@ -137,7 +137,8 @@ only forth definitions also wsing
 : nr  { figure *element #newrow attr ! } ;  \ new row
 : drawui  consolas font>  unmount  figure (ui) ;
 
-: (system)   ide-system  repl @ ui !  ui @ if ui-mouse then ;
+: ?toggle-ui  etype ALLEGRO_EVENT_KEY_DOWN = keycode <f10> = and if  ui @ not ui !  then ;
+: (system)   ide-system  ?toggle-ui  ui @ if ui-mouse then ;
 
 0 value ui:lasterr
 :make ?system
