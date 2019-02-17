@@ -136,9 +136,8 @@ only forth definitions also wsing
 : label  ( text c )   { figure *element data! } ;
 : nr  { figure *element #newrow attr ! } ;  \ new row
 : drawui  consolas font>  unmount  figure (ui) ;
-: toggle-ui  etype ALLEGRO_EVENT_KEY_DOWN = keycode <`> = and -exit  ui @ not ui ! ;
 
-: (system)   ide-system  toggle-ui  ui @ if ui-mouse then ;
+: (system)   ide-system  repl @ ui !  ui @ if ui-mouse then ;
 
 0 value ui:lasterr
 :make ?system
@@ -150,5 +149,7 @@ only forth definitions also wsing
 :make ?overlay  ide-overlay  ui @ if drawui then  unmount ;
 
 :make free-node  destroy ;
+
+: empty  hovered vacate  fs @ not if unclick then  empty ;
 
 gild
