@@ -137,7 +137,12 @@ only forth definitions also wsing
 : nr  { figure *element #newrow attr ! } ;  \ new row
 : drawui  consolas font>  unmount  figure (ui) ;
 
-: ?toggle-ui  etype ALLEGRO_EVENT_KEY_DOWN = keycode <f10> = and if  ui @ not ui !  then ;
+: ?toggle-ui
+    etype ALLEGRO_EVENT_KEY_DOWN = keycode <f10> = and if  ui @ not ui !  then
+    etype ALLEGRO_EVENT_KEY_DOWN = keycode <f2> = and if
+        repl @ ui @ or if repl off ui off else repl on ui on then
+    then 
+;
 : (system)   ide-system  ?toggle-ui  ui @ if ui-mouse then ;
 
 0 value ui:lasterr
