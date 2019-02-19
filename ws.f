@@ -124,7 +124,11 @@ define wsing
 only forth definitions also wsing
 
 : ui-mouse
-    etype ALLEGRO_EVENT_MOUSE_AXES = if figure ?hover then
+    etype ALLEGRO_EVENT_MOUSE_AXES = if
+        figure ?hover
+        evt ALLEGRO_MOUSE_EVENT.dz @ 0 > if ide:pageup then
+        evt ALLEGRO_MOUSE_EVENT.dz @ 0 < if ide:pagedown then
+    then
     etype ALLEGRO_EVENT_MOUSE_BUTTON_DOWN = if ?click then
     etype ALLEGRO_EVENT_MOUSE_BUTTON_UP = if unclick then
 ;
@@ -140,7 +144,7 @@ only forth definitions also wsing
 : ?toggle-ui
     etype ALLEGRO_EVENT_KEY_DOWN = keycode <f10> = and if  ui @ not ui !  then
     etype ALLEGRO_EVENT_KEY_DOWN = keycode <f2> = and if
-        repl @ ui @ or if repl off ui off else repl on ui on then
+        repl @ ui @ or if page repl off ui off else repl on ui on then
     then 
 ;
 : (system)   ide-system  ?toggle-ui  ui @ if ui-mouse then ;
