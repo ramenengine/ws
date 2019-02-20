@@ -5,16 +5,23 @@
 
 only forth definitions
 
-
 create figure _node static
 create window  %rect sizeof /allot
 create hovered  16 stack,
 variable ui  ui on
 
+( element class )
+0 dynamic-class: _element
+    var attr  
+    %rect sizeof field span \ pos and dims
+    var data <adr 
+    var datasize <int 
+;class
+:noname  data @ free throw ; _element class.destructor !
+    
 define wsing
     include ws/rangetools.f
-    
-    
+
     ( attributes )
     #1 8 <<
     \ bit #deleted
@@ -22,16 +29,6 @@ define wsing
     bit #newrow
     bit #click
     drop
-    
-    ( element class )
-    0 dynamic-class: _element
-        var attr  
-        %rect sizeof field span \ pos and dims
-        var data <adr 
-        var datasize <int 
-    ;class
-    :noname  data @ -exit data @ free throw ; _element class.destructor !
-    
         
     \ --- Low-level stuff ---
     : ??  attr @ and 0<> ;
@@ -90,15 +87,14 @@ define wsing
     ;
         
     : draw-window
-        figure length 0= ?exit
         window xy@ 10 10 2- at  window wh@ 20 20 2+ black 0.4 alpha rectf  ;
     
     : /window
         displayw 0.37 * 500 max displayw min  displayh 100 - window wh!
         displayw window w@ - 0 window xy!
         window xywh@ margins xywh!
-        
-    ; 
+    ;
+    
     : (ui)  ( figure - )  /window  draw-window  margins xy@ at  each> as draw ;
     
     \ --- interaction ---
@@ -110,11 +106,13 @@ define wsing
             then
     ;
     : click
+        me
         hovered >top @ >{
             #boxed ?? if
                 #click attr or!
-                data@ } ['] evaluate catch ?.catch
+                data@ } rot ( data count old-me ) as ['] evaluate catch ?.catch
             ;then
+            drop 
         } 
     ;
     : ?click  hovered length -exit  click ;
@@ -125,12 +123,12 @@ only forth definitions also wsing
 
 : ui-mouse
     etype ALLEGRO_EVENT_MOUSE_AXES = if
-        figure ?hover
+        { figure ?hover }
         evt ALLEGRO_MOUSE_EVENT.dz @ 0 > if ide:pageup then
         evt ALLEGRO_MOUSE_EVENT.dz @ 0 < if ide:pagedown then
     then
     etype ALLEGRO_EVENT_MOUSE_BUTTON_DOWN = if ?click then
-    etype ALLEGRO_EVENT_MOUSE_BUTTON_UP = if unclick then
+    etype ALLEGRO_EVENT_MOUSE_BUTTON_UP = if { unclick } then
 ;
 
 : blank  ( figure )
@@ -160,6 +158,6 @@ only forth definitions also wsing
 
 :make free-node  destroy ;
 
-: empty  hovered vacate  fs @ not if unclick then  empty ;
+: empty  hovered vacate  fs @ not if unclick then  figure blank  _element invalidate-pool  empty ;
 
 gild
