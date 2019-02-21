@@ -5,19 +5,23 @@
 
 only forth definitions
 
-create figure _node static
 create window  %rect sizeof /allot
-create hovered  16 stack,
+create hovered 32 stack,
 variable ui  ui on
+create mouse 0 , 0 ,
 
 ( element class )
 0 dynamic-class: _element
     var attr  
-    %rect sizeof field span \ pos and dims
+    0 field span \ pos and dims
+    var x var y var w var h
     var data <adr 
     var datasize <int 
 ;class
 :noname  data @ free throw ; _element class.destructor !
+
+create figure _element static
+
     
 define wsing
     include ws/rangetools.f
@@ -86,6 +90,29 @@ define wsing
                   else  drawlabel  then 
     ;
         
+        
+    ( transformation stack )
+    create mstack 16 cells 32 * /allot
+    variable (m)
+    : m  (m) @ [ 16 cells 32 * #1 - ]# and mstack + ;
+    : mfetch  ( transform - )  m swap 16 cells move ;
+    : mpush ( transform - )  16 cells (m) +!   m 16 cells move  m al_use_transform ;
+    : mdrop  ( - )  -16 cells (m) +!  m al_use_transform ;
+    m al_identity_transform m al_use_transform
+    : translate  ( transform x y - ) 2af al_translate_transform ;
+    : scale  ( transform sx sy - ) 2af al_scale_transform ;
+    : rotate  ( transform angle - ) 1af al_rotate_transform ;
+    : hshear  ( transform n - ) 1af al_horizontal_shear_transform ;
+    : vshear  ( transform n - ) 1af al_vertical_shear_transform ;
+    
+    ( draw relative )
+    transform r:m
+    
+    : relative>  ( object - <code> )
+        >{  r:m mfetch  r:m  pos@ [undefined] HD [if] 2pfloor [then] translate  r:m mpush }
+        r> call
+        mdrop ;
+        
     : draw-window
         window xy@ 10 10 2- at  window wh@ 20 20 2+ black 0.4 alpha rectf  ;
     
@@ -95,13 +122,14 @@ define wsing
         window xywh@ margins xywh!
     ;
     
-    : (ui)  ( figure - )  /window  draw-window  margins xy@ at  each> as draw ;
+    : (ui)  ( figure - )
+        /window  draw-window  margins xy@ at  dup relative>  each> as draw ;
     
     \ --- interaction ---
     : ?hover  ( figure - )
         hovered vacate
         each> as
-            evt ALLEGRO_MOUSE_EVENT.x 2@ 2p pos@ dims@ area inside? if
+            mouse xy@ pos@ me node.parent @ >{ pos@ } 2+ dims@ area inside? if
                 me hovered push  
             then
     ;
@@ -118,14 +146,24 @@ define wsing
     : ?click  hovered length -exit  click ;
     : unclick  figure each> as  #click attr not! ;
 
+    consolas chrh 30 + constant rowh
+
 \ --- Public stuff ---
 only forth definitions also wsing
 
+
+: window:up   figure >{ y @ rowh - y ! } ;
+: window:down figure >{ y @ rowh + 0 min y ! } ;
+
+: ws:pageup   mouse xy@ window aabb@ inside? if window:down else ide:pageup then ;
+: ws:pagedown mouse xy@ window aabb@ inside? if window:up else ide:pagedown then ;
+
 : ui-mouse
     etype ALLEGRO_EVENT_MOUSE_AXES = if
+        evt ALLEGRO_MOUSE_EVENT.x 2@ 2p mouse xy!
         { figure ?hover }
-        evt ALLEGRO_MOUSE_EVENT.dz @ 0 > if ide:pageup then
-        evt ALLEGRO_MOUSE_EVENT.dz @ 0 < if ide:pagedown then
+        evt ALLEGRO_MOUSE_EVENT.dz @ 0 > if ws:pageup then
+        evt ALLEGRO_MOUSE_EVENT.dz @ 0 < if ws:pagedown then
     then
     etype ALLEGRO_EVENT_MOUSE_BUTTON_DOWN = if ?click then
     etype ALLEGRO_EVENT_MOUSE_BUTTON_UP = if { unclick } then
