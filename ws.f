@@ -11,7 +11,7 @@ variable ui  ui on
 create mouse 0 , 0 ,
 
 ( element class )
-0 dynamic-class: _element
+0 node-class: _element
     var attr  
     0 field span \ pos and dims
     var x var y var w var h
@@ -106,7 +106,7 @@ define wsing
     : vshear  ( transform n - ) 1af al_vertical_shear_transform ;
     
     ( draw relative )
-    transform r:m
+    transform: r:m
     
     : relative>  ( object - <code> )
         >{  r:m mfetch  r:m  pos@ [undefined] HD [if] 2pfloor [then] translate  r:m mpush }
