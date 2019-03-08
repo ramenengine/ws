@@ -198,4 +198,5 @@ only forth definitions also wsing
 
 : empty  hovered vacate  fs @ not if unclick then  figure blank  _element invalidate-pool  empty ;
 
+oscursor on 
 gild
