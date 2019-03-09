@@ -1,4 +1,5 @@
 \ really basic workspaces functionality; just buttons (and labels that are also buttons)
+[defined] wsing [if] \\ [then]
 
 #2 #0 #0 [version] [ws]
 #1 #5 #0 [ramen] [checkver]
@@ -185,18 +186,21 @@ only forth definitions also wsing
 ;
 : (system)   ide-system  ?toggle-ui  ui @ if ui-mouse then ;
 
-0 value ui:lasterr
-:make ?system
-    ['] (system) catch
-    dup if ui:lasterr 0= if cr ." GUI error." dup to ui:lasterr throw ;then then
-    to ui:lasterr
-;
+[defined] dev [if]
+    0 value ui:lasterr
+    :make ?system
+        ['] (system) catch
+        dup if ui:lasterr 0= if cr ." GUI error." dup to ui:lasterr throw ;then then
+        to ui:lasterr
+    ;
+    
+    :make ?overlay  ide-overlay  ui @ if drawui then  unmount ;
+    
+    :make free-node  destroy ;
+    
+    : empty  hovered vacate  fs @ not if unclick then  figure blank  _element invalidate-pool  empty ;
+    
+    oscursor on 
+[then]
 
-:make ?overlay  ide-overlay  ui @ if drawui then  unmount ;
-
-:make free-node  destroy ;
-
-: empty  hovered vacate  fs @ not if unclick then  figure blank  _element invalidate-pool  empty ;
-
-oscursor on 
 gild
